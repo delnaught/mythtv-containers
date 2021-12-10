@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ -z "$VNCPASSWORD" ]; then
+    echo "VNCPASSWORD environment must be set"
+else
+    mkdir -p ~/.vnc
+    echo "$VNCPASSWORD" | vncpasswd -f > ~/.vnc/passwd
+    chmod 0600 ~/.vnc/passwd
+
+    exec tigervncserver -localhost no -xstartup mythtv-setup -geometry 1024x768 -fg :1
+fi

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+echo " *** xmlfilldatabase"
+set -e
+
+XMLTV_DIR="${XMLTV_FILE%/*}"
+CACHE_DIR="${XMLTV_DIR}/cache"
+
+for dir in $CACHE_DIR $ICON_DIR; do if [[ ! -d ${dir} ]]; then mkdir -p ${dir}; fi; done
+
+zap2xml.pl -u $ZAP2XML_USER -p $ZAP2XML_PASSWD -U -o $XMLTV_FILE -c $CACHE_DIR -A "new live" -T -d $EPG_DAYS -F -a -i $ICON_DIR
+mythfilldatabase --file --sourceid $SOURCE_ID --xmlfile $XMLTV_FILE
+
+
+# 2021-12-03 17:33:47.159934 E  DB Error (programgenres insert):
+# Query was:
+# INSERT INTO programgenres        ( chanid,  starttime, genre,  relevance) VALUES (?, ?,    ?, ?)
+# Bindings were:
+# :CHANID=10902, :START=2021-12-13T02:00:00.000Z, :genre="News", :relevance=0
+# Driver error was [2/1062]:
+# QMYSQL3: Unable to execute statement
+# Database error was:
+# Duplicate entry '10902-2021-12-13 02:00:00-0' for key 'PRIMARY'
+
