@@ -1,12 +1,10 @@
 version: "3.7"
 
 secrets:
-  ZAP2XML_USER:
+  zap2xml_user:
     file: ./zap2xml_user.secret
-  ZAP2XML_PASSWD:
+  zap2xml_passwd:
     file: ./zap2xml_passwd.secret
-  MARIADB_ROOT_PASSWORD:
-    file: ./mariadb_root_password.secret
 
 services:
   database:
@@ -15,13 +13,13 @@ services:
       - 3306:3306
     volumes:
       - /media/data/mysql:/var/lib/mysql
-    secrets:
-      - MARIADB_ROOT_PASSWORD
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: 1
     restart: "unless-stopped"
   backend:
     image: delnaught/mythtv-backend:main-32-focal
     # entrypoint: ["sh", "-c", "while true; do date; sleep 10; done"]
-    entrypoint: ["mythbackend", "--noupnp"]
+    entrypoint: ["sh", "-c", "ZAP2XML_USER=$$(cat /run/secrets/zap2xml_user) ZAP2XML_PASSWD=$$(cat /run/secrets/zap2xml_passwd) mythbackend --noupnp"]
     hostname: mrx
     user: 105:107
     network_mode: "host"
@@ -34,7 +32,7 @@ services:
       ICON_DIR: /var/lib/mythtv/.mythtv/channels
       SOURCE_ID: 1
     secrets:
-      - ZAP2XML_USER
-      - ZAP2XML_PASSWD
+      - zap2xml_user
+      - zap2xml_passwd
     restart: "unless-stopped"
   
