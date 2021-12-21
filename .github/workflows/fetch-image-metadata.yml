@@ -8,9 +8,11 @@ on:
       image:
         description: 'remote image with desired metadata'
         required: true
+        type: string
       tag:
         description: 'tag for desired image'
         required: true
+        type: string
     outputs:
       metadata:
         description: 'metadata from the remote image'
