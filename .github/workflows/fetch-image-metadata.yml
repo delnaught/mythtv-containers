@@ -1,0 +1,39 @@
+---
+
+name: fetch-image-metadata
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: 'remote image with desired metadata'
+        required: true
+      tag:
+        description: 'tag for desired image'
+        required: true
+    outputs:
+      metadata:
+        description: 'metadata from the remote image'
+        value: ${{ jobs.query-dockerhub.outputs.info }}
+        
+
+jobs:
+  query-dockerhub:
+    runs-on: ubuntu-latest
+    outputs:
+      info: ${{ steps.fetch-metadata.outputs.metadata }}
+    steps:
+      # from https://stackoverflow.com/questions/62600611/get-labels-of-remote-docker-image
+      - id: fetch-metadata
+        run: |
+          repo=${{ github.event.inputs.image }}
+          tag=${{ github.event.inputs.tag }}
+          token=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq -r '.token')
+          digest=$(curl -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+          -H "Authorization: Bearer $token" \
+          -s "https://registry-1.docker.io/v2/${repo}/manifests/${tag}" \
+          | jq -r .config.digest)
+          meta=$(curl -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+          -H "Authorization: Bearer $token" \
+          -s -L "https://registry-1.docker.io/v2/${repo}/blobs/${digest}" | jq . )
+          echo "::set-output name=metadata::${meta}"
