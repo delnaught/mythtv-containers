@@ -37,5 +37,5 @@ jobs:
           | jq -r '.config.digest')
           meta=$(curl -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
           -H "Authorization: Bearer $token" \
-          -s -L "https://registry-1.docker.io/v2/${repo}/blobs/${digest}" | jq -r '.')
+          -s -L "https://registry-1.docker.io/v2/${repo}/blobs/${digest}")
           echo "::set-output name=metadata::${meta}"
