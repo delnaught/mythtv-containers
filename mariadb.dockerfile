@@ -2,7 +2,7 @@ ARG BUILDER_IMAGE=ubuntu:focal
 # versions 10.4 and greater break import of user table
 ARG RUNTIME_IMAGE=mariadb:10.3-focal
 
-FROM $FROM_IMAGE as builder
+FROM $BUILDER_IMAGE as builder
 
 ARG MYTHTV_VERSION
 
