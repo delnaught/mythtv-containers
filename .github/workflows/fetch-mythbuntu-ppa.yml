@@ -29,7 +29,7 @@ jobs:
       - run: python -m pip install launchpadlib
       - id: fetch-ppa-versions
         run: |
-          python -c '
+          echo $(python -c '
           import launchpadlib
           import re
 
@@ -50,7 +50,6 @@ jobs:
             return build
 
           try:
-            print(launchpadlib.__version__)
             launchpad = Launchpad.login_anonymously("mythbuntu-ppa-query", "production", version="devel")
             mythbuntu = launchpad.people["mythbuntu"]
             ppa = mythbuntu.getPPAByName(name="${{ inputs.ppa }}")
@@ -62,5 +61,5 @@ jobs:
 
           except HTTPError as e:
             print(e.content)
-          '
+          ')
           
