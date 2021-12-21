@@ -19,5 +19,5 @@ jobs:
     runs-on: ubuntu-latest
     needs: fetch-image-meta
     steps:
-      - run: echo ${{ needs.fetch-image-meta.outputs.metadata }}
+      - run: echo "${{ needs.fetch-image-meta.outputs.metadata }}"
 
