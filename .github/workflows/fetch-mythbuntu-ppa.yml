@@ -12,7 +12,7 @@ on:
       depth:
         description: 'number of build records fetched'
         required: false
-        type: numeric
+        type: number
         default: 40
     outputs:
       versions:
