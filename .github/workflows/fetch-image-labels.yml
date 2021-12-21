@@ -4,6 +4,7 @@ name: fetch-image-labels
 
 on:
   workflow_dispatch: {}
+  push:
 
 jobs:
   query-dockerhub:
