@@ -5,6 +5,7 @@ name: build-and-publish-backend
 on:
   push:
     paths:
+      - .github/workflows/build-and-publish-backend.yml
       - mythtv.dockerfile
       - scripts/**
   workflow_dispatch: {}

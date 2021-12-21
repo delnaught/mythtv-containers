@@ -5,6 +5,7 @@ name: build-and-publish-database
 on:
   push:
     paths:
+      - .github/workflows/build-and-publish-database.yml
       - mariadb.dockerfile
   workflow_dispatch: {}
 
