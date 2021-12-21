@@ -3,18 +3,32 @@
 name: fetch-mythbuntu-ppa
 
 on:
-  workflow_dispatch: {}
-  push:
-    paths:
-      - .github/workflows/fetch-mythbuntu-ppa.yml
+  workflow_call:
+    inputs:
+      ppa:
+        description: 'mythbuntu PPA name'
+        required: true
+        type: string
+      depth:
+        description: 'number of build records fetched'
+        required: false
+        type: numeric
+        default: 40
+    outputs:
+      versions:
+        description: 'metadata from the remote image'
+        value: ${{ jobs.query-launchpad.outputs.info }}
 
 jobs:
   query-launchpad:
     runs-on: ubuntu-latest
+    outputs:
+      info: ${{ steps.fetch-ppa-versions.outputs.versions }}
     steps:
       - run: python -m pip install --upgrade pip
       - run: python -m pip install launchpadlib
-      - run: |
+      - id: fetch-ppa-versions
+        run: |
           python -c '
           import launchpadlib
           import re
@@ -39,12 +53,12 @@ jobs:
             print(launchpadlib.__version__)
             launchpad = Launchpad.login_anonymously("mythbuntu-ppa-query", "production", version="devel")
             mythbuntu = launchpad.people["mythbuntu"]
-            ppa = mythbuntu.getPPAByName(name="32")
-            all_records = ppa.getBuildRecords(build_state = "Successfully built")[:40]
+            ppa = mythbuntu.getPPAByName(name="${{ inputs.ppa }}")
+            all_records = ppa.getBuildRecords(build_state = "Successfully built")[:${{ inputs.depth }}]
             amd64_records = (record for record in all_records if "amd64" == record.arch_tag)
             amd64_builds = (tokenize_record(record) for record in amd64_records)
             versions = (build.version for build in amd64_builds if "20.04" == build.os)
-            print(list(versions))
+            print(f"::set-output name=versions::{list(versions)}")
 
           except HTTPError as e:
             print(e.content)
