@@ -29,13 +29,18 @@ jobs:
       - id: fetch-metadata
         run: |
           repo=${{ github.event.inputs.image }}
+          echo $repo
           tag=${{ github.event.inputs.tag }}
+          echo $tag
           token=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq -r '.token')
+          echo $token
           digest=$(curl -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
           -H "Authorization: Bearer $token" \
           -s "https://registry-1.docker.io/v2/${repo}/manifests/${tag}" \
-          | jq -r .config.digest)
+          | jq -r '.config.digest')
+          echo $digest
           meta=$(curl -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
           -H "Authorization: Bearer $token" \
-          -s -L "https://registry-1.docker.io/v2/${repo}/blobs/${digest}" | jq . )
+          -s -L "https://registry-1.docker.io/v2/${repo}/blobs/${digest}" | jq -r '.')
+          echo $meta
           echo "::set-output name=metadata::${meta}"
