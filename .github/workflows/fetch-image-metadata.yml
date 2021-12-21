@@ -28,9 +28,9 @@ jobs:
       # from https://stackoverflow.com/questions/62600611/get-labels-of-remote-docker-image
       - id: fetch-metadata
         run: |
-          repo="${{ github.event.inputs.image }}"
+          repo="${{ inputs.image }}"
           echo "repo => $repo"
-          tag="${{ github.event.inputs.tag }}"
+          tag="${{ inputs.tag }}"
           echo "tag => $tag"
           token=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq -r '.token')
           echo $token
