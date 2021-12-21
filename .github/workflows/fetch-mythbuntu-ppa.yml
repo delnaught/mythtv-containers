@@ -54,7 +54,7 @@ jobs:
             launchpad = Launchpad.login_anonymously("mythbuntu-ppa-query", "production", version="devel")
             mythbuntu = launchpad.people["mythbuntu"]
             ppa = mythbuntu.getPPAByName(name="${{ inputs.ppa }}")
-            all_records = ppa.getBuildRecords(build_state = "Successfully built")[:${{ inputs.depth }}]
+            all_records = ppa.getBuildRecords(build_state = "Successfully built")[:40]
             amd64_records = (record for record in all_records if "amd64" == record.arch_tag)
             amd64_builds = (tokenize_record(record) for record in amd64_records)
             versions = (build.version for build in amd64_builds if "20.04" == build.os)
