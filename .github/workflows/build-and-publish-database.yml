@@ -25,4 +25,13 @@ jobs:
         with:
           push: true
           file: mariadb.dockerfile
-          tags: delnaught/mythtv-database:${{ github.ref_name }}-32-focal
+          build-args:
+            - BUILDER_IMAGE: ubuntu:focal
+            - RUNTIME_IMAGE: mariadb:10.3-focal
+            - MYTHTV_VERSION: 2:32.0~master.202112210533.ed7778247b~ubuntu20.04.1
+          labels:
+            - mythtv.source_package_version: 2:32.0~master.202112210533.ed7778247b~ubuntu20.04.1
+          tags:
+            - delnaught/mythtv-database:32-focal-202112210533
+            - delnaught/mythtv-database:32-focal
+            - delnaught/mythtv-database:32

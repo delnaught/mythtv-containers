@@ -1,4 +1,10 @@
-FROM ubuntu:focal as builder
+ARG BUILDER_IMAGE=ubuntu:focal
+# versions 10.4 and greater break import of user table
+ARG RUNTIME_IMAGE=mariadb:10.3-focal
+
+FROM $FROM_IMAGE as builder
+
+ARG MYTHTV_VERSION
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends mariadb-server gnupg \
@@ -8,12 +14,11 @@ RUN apt-get update \
     && apt-get update \
     && /etc/init.d/mysql start \
     && while [ ! -e /var/run/mysqld/mysqld.sock ]; do sleep 1; done; sleep 1 \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mythtv-database \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mythtv-database=$MYTHTV_VERSION \
     && mysqldump --all-databases -uroot > /tmp/all-databases.sql \
     && /etc/init.d/mysql stop
 
-# versions 10.4 and greater break import of user table
-FROM mariadb:10.3-focal
+FROM $RUNTIME_IMAGE
 
 COPY --from=builder /tmp/all-databases.sql /docker-entrypoint-initdb.d/
 
