@@ -1,0 +1,49 @@
+---
+
+name: fetch-mythbuntu-ppa
+
+on:
+  workflow_dispatch: {}
+  push:
+
+jobs:
+  query-launchpad:
+    runs-on: ubuntu-latest
+    steps:
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install launchpadlib
+      - run: |
+          python -c '
+          import launchpadlib
+          import re
+
+          from launchpadlib.launchpad import Launchpad
+          from lazr.restfulclient.errors import HTTPError
+
+          record_re = re.compile(r"\.(?P<date>[0-9]+)\.(?P<commit>[0-9a-f]+)~ubuntu(?P<os>[0-9]+\.[0-9]+)\.[0-9]$")
+
+          def tokenize_record(record):
+            class build: pass
+            match = record_re.search(record.source_package_version)
+            if None != match:
+              build.version = record.source_package_version
+              build.arch = record.arch_tag
+              build.date = match.group("date")
+              build.commit = match.group("commit")
+              build.os = match.group("os")
+            return build
+
+          try:
+            print(launchpadlib.__version__)
+            launchpad = Launchpad.login_anonymously("mythbuntu-ppa-query", "production", version="devel")
+            mythbuntu = launchpad.people["mythbuntu"]
+            ppa = mythbuntu.getPPAByName(name="32")
+            all_records = ppa.getBuildRecords(build_state = "Successfully built")[:40]
+            amd64_records = (record for record in all_records if "amd64" == record.arch_tag)
+            amd64_builds = (tokenize_record(record) for record in amd64_records)
+            amd64_focal = (build for build in amd64_builds if "20.04" == build.os)
+
+          except HTTPError as e:
+            print(e.content)
+          '
+          
