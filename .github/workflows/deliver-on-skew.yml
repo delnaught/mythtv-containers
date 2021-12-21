@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/deliver-on-skew.yml
       - .github/workflows/fetch-image-metadata.yml
+      - .github/workflows/fetch-mythbuntu-ppa.yml
 
 jobs:
   fetch-backend-meta:
