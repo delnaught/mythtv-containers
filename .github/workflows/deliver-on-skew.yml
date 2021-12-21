@@ -11,7 +11,7 @@ on:
 
 jobs:
   fetch-image-meta:
-    uses: delnaught/mythtv-containers/.github/workflows/fetch-image-metadata.yml@${{env.GITHUB_REF_NAME}}
+    uses: delnaught/mythtv-containers/.github/workflows/fetch-image-metadata.yml@query-dockerhub
     with:
       image: delnaught/mythtv-backend
       tag: 32
