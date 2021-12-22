@@ -28,6 +28,7 @@ jobs:
       ppa: ${{ needs.fetch-mythbuntu-ppa.outputs.versions }}
       meta: ${{ needs.fetch-backend-meta.outputs.metadata }}
   deliver-backend:
+    runs-on: ubuntu-latest
     needs:
       - get-backend-skew
     if: ${{ 0 < needs.get-backend-skew.outputs.length }}
