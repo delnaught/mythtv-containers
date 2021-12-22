@@ -6,7 +6,7 @@ on:
   push:
     paths:
       - .github/workflows/*
-      - *.dockerfile
+      - ./*.dockerfile
 
 jobs:
   fetch-mythbuntu-ppa:
