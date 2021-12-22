@@ -14,7 +14,7 @@ jobs:
     with:
       mythbuntu-release: 32
       os-release: 20.04
-      record-count: 50
+      record-count: 20
   fetch-backend-meta:
     uses: delnaught/mythtv-containers/.github/workflows/fetch-image-metadata.yml@query-dockerhub
     with:
