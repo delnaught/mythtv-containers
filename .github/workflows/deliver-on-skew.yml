@@ -5,8 +5,8 @@ name: deliver-on-skew
 on:
   push:
     paths:
-      - .github/workflows/*
-      - ./*.dockerfile
+      - '.github/workflows/*'
+      - '**.dockerfile'
 
 jobs:
   fetch-mythbuntu-ppa:
