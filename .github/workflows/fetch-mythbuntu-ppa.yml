@@ -66,7 +66,7 @@ jobs:
             return build
 
           ppa_name = os.environ["mythbuntu-release"]
-          records = os.environ["record-count"]
+          records = int(os.environ["record-count"])
           arch = os.environ["mythbuntu-arch"]
           release = os.environ["os-release"]
 
