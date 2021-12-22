@@ -12,8 +12,9 @@ jobs:
   fetch-mythbuntu-ppa:
     uses: delnaught/mythtv-containers/.github/workflows/fetch-mythbuntu-ppa.yml@query-dockerhub
     with:
-      ppa: 32
-      depth: 50
+      mythbuntu-release: 32
+      os-release: 20.04
+      record-count: 50
   fetch-backend-meta:
     uses: delnaught/mythtv-containers/.github/workflows/fetch-image-metadata.yml@query-dockerhub
     with:
