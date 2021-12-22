@@ -27,3 +27,16 @@ jobs:
     with:
       ppa: ${{ needs.fetch-mythbuntu-ppa.outputs.versions }}
       meta: ${{ needs.fetch-backend-meta.outputs.metadata }}
+  deliver-backend:
+    needs:
+      - get-backend-skew
+    runs-on: ubuntu-latest
+    if: ${{ 0 < needs.get-backend-skew.outputs.length }}
+    strategy:
+      matrix:
+        version: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
+    steps:
+      - id: build-and-publish
+        uses: delnaught/mythtv-containers/.github/workflows/build-and-publish-backend.yml@query-dockerhub
+        with:
+          source-ref: ${{ matrix.version }}

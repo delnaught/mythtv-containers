@@ -16,23 +16,25 @@ on:
     outputs:
       matrix:
         description: 'json array of versions to be delivered'
-        value: ${{ jobs.slice.outputs.slice }}
-      first:
-        description: 'first entry in matrix array'
-        value: ${{ jobs.slice.outputs.first }}
+        value: ${{ jobs.parse.outputs.slice }}
+      length:
+        description: 'length of matrix array'
+        value: ${{ jobs.parse.outputs.length }}
         
-
 jobs:
-  slice:
+  parse:
     runs-on: ubuntu-latest
     outputs:
-      slice: ${{ steps.slice-skew.outputs.slice }}
-      first: ${{ steps.first-skew.outputs.first }}
+      slice: ${{ steps.parse-skew.outputs.slice }}
+      length: ${{ steps.parse-skew.outputs.length }}
     steps:
-      - id: slice-skew
+      - id: parse-skew
         run: |
+          slice='${{ inputs.ppa }}'
           image_version=$(echo '${{ inputs.meta  }}' | jq -r '.config.Labels."mythtv.source_package_version"')
-          ppa_index=$(echo '${{ inputs.ppa }}' | jq --arg ref $image_version -r '. | index($ref)')
-          slice=$(echo '${{ inputs.ppa }}' | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
-          first=$(echo $slice | jq '.[0]')
-          echo "::set-output name=slice::${slice} name=first::${first}"
+          ppa_index=$(echo $slice | jq --arg ref $image_version -r '. | index($ref)')
+          if [[ 'null' != $ppa_index ]]; then
+          slice=$(echo $slice | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
+          fi
+          length=$(echo $slice | jq -r '. | length')
+          echo "::set-output name=slice::${slice} name=length=${length}"

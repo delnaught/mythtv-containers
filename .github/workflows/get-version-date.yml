@@ -1,0 +1,28 @@
+---
+
+name: get-version-date
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'source version string'
+        required: true
+        type: string
+    outputs:
+      date:
+        description: 'date parsed from source version string'
+        value: ${{ jobs.prase.outputs.date }}
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    outputs:
+      date: ${{ steps.get-date.outputs.date }}
+    steps:
+      - id: get-date
+        run: |
+          date=${{ inputs.version }}
+          date=${date#*[~\+]*\.}
+          date=${date%%.*}
+          echo "::set-output name=date::${date}"

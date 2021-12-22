@@ -3,36 +3,33 @@
 name: build-and-publish-backend
 
 on:
-  push:
-    paths:
-      - .github/workflows/build-and-publish-backend.yml
-      - mythtv.dockerfile
-      - scripts/**
-  workflow_dispatch: {}
+  workflow_call:
+    inputs:
+      source-ref:
+        description: 'source ppa version for mythtv'
+        required: true
+        type: string
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v1
+      - id: get-date
+        uses: delnaught/mythtv-containers/.github/workflows/get-version-date.yml@query-dockerhub
+        with:
+          version: ${{ inputs.source-ref }}
+      - uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
+      - uses: docker/build-push-action@v2
         with:
           push: true
           file: mythtv.dockerfile
           build-args: |
             FROM_IMAGE: ubuntu:focal
-            MYTHTV_VERSION=2:32.0~master.202112210533.ed7778247b~ubuntu20.04.1
+            MYTHTV_VERSION=${{ inputs.source-ref }}
           labels: |
-            mythtv.source_package_version=2:32.0~master.202112210533.ed7778247b~ubuntu20.04.1
+            mythtv.source_package_version=${{ inputs.source-ref }}
           tags: |
-            delnaught/mythtv-backend:32-focal-202112210533
-            delnaught/mythtv-backend:32-focal
-            delnaught/mythtv-backend:32
+            delnaught/mythtv-backend:32-focal-${{ steps.get-date.outputs.date }}
