@@ -11,11 +11,11 @@ on:
       - .github/workflows/fetch-mythbuntu-ppa.yml
 
 jobs:
-  # fetch-backend-meta:
-  #   uses: delnaught/mythtv-containers/.github/workflows/fetch-image-metadata.yml@query-dockerhub
-  #   with:
-  #     image: delnaught/mythtv-backend
-  #     tag: 32
+  fetch-backend-meta:
+    uses: delnaught/mythtv-containers/.github/workflows/fetch-image-metadata.yml@query-dockerhub
+    with:
+      image: delnaught/mythtv-backend
+      tag: 32
   fetch-backend-ppa:
     uses: delnaught/mythtv-containers/.github/workflows/fetch-mythbuntu-ppa.yml@query-dockerhub
     with:
@@ -24,11 +24,10 @@ jobs:
   get-image-skew:
     runs-on: ubuntu-latest
     needs:
-      # - fetch-backend-meta
+      - fetch-backend-meta
       - fetch-backend-ppa
     steps:
       - run: |
-          # image_version=$(echo '${{ needs.fetch-backend-meta.outputs.metadata }}' | jq -r '.config.Labels."mythtv.source_package_version"')
-          ppa_versions=${{ needs.fetch-backend-ppa.outputs.versions }}
-          echo $ppa_versions
+          image_version=$(echo '${{ needs.fetch-backend-meta.outputs.metadata }}' | jq -r '.config.Labels."mythtv.source_package_version"')
+          ppa_versions=($(echo '${{ needs.fetch-backend-ppa.outputs.versions }}' | jq -r '. | join(" ")'))
 
