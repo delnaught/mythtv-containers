@@ -28,6 +28,6 @@ jobs:
       - id: slice-skew
         run: |
           image_version=$(echo '${{ inputs.meta  }}' | jq -r '.config.Labels."mythtv.source_package_version"')
-          ppa_index=$(echo '${{ inputs.ppa }}' | jq --arg ref $image_version -r '. | index("$ref")')
+          ppa_index=$(echo '${{ inputs.ppa }}' | jq --arg ref $image_version -r '. | index($ref)')
           slice=$(echo '${{ inputs.ppa }}' | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
           echo "::set-output name=slice::${slice}"
