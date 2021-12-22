@@ -10,12 +10,12 @@ on:
 
 jobs:
   fetch-mythbuntu-ppa:
-    uses: .github/workflows/fetch-mythbuntu-ppa.yml
+    uses: .github/workflows/fetch-mythbuntu-ppa.yml@${{github.ref_name}}
     with:
       ppa: 32
       depth: 50
   fetch-backend-meta:
-    uses: .github/workflows/fetch-image-metadata.yml
+    uses: .github/workflows/fetch-image-metadata.yml@${{github.ref_name}}
     with:
       image: delnaught/mythtv-backend
       tag: 32
@@ -23,7 +23,7 @@ jobs:
     needs:
       - fetch-mythbuntu-ppa
       - fetch-backend-meta
-    uses: .github/workflows/get-version-skew.yml
+    uses: .github/workflows/get-version-skew.yml@${{github.ref_name}}
     with:
       ppa: ${{ needs.fetch-mythbuntu-ppa.outputs.versions }}
       meta: ${{ needs.fetch-backend-meta.outputs.metadata }}
