@@ -3,30 +3,27 @@
 name: deliver-on-skew
 
 on:
-  workflow_dispatch: {}
   push:
     paths:
-      - .github/workflows/deliver-on-skew.yml
-      - .github/workflows/fetch-image-metadata.yml
-      - .github/workflows/fetch-mythbuntu-ppa.yml
-      - .github/workflows/get-version-skew.yml
+      - .github/workflows/*
+      - *.dockerfile
 
 jobs:
-  fetch-backend-meta:
-    uses: delnaught/mythtv-containers/.github/workflows/fetch-image-metadata.yml@query-dockerhub
-    with:
-      image: delnaught/mythtv-backend
-      tag: 32
-  fetch-backend-ppa:
-    uses: delnaught/mythtv-containers/.github/workflows/fetch-mythbuntu-ppa.yml@query-dockerhub
+  fetch-mythbuntu-ppa:
+    uses: .github/workflows/fetch-mythbuntu-ppa.yml
     with:
       ppa: 32
       depth: 50
-  get-image-skew:
-    needs:
-      - fetch-backend-meta
-      - fetch-backend-ppa
-    uses: delnaught/mythtv-containers/.github/workflows/get-version-skew.yml@query-dockerhub
+  fetch-backend-meta:
+    uses: .github/workflows/fetch-image-metadata.yml
     with:
-      ppa: ${{ needs.fetch-backend-ppa.outputs.versions }}
+      image: delnaught/mythtv-backend
+      tag: 32
+  get-backend-skew:
+    needs:
+      - fetch-mythbuntu-ppa
+      - fetch-backend-meta
+    uses: .github/workflows/get-version-skew.yml
+    with:
+      ppa: ${{ needs.fetch-mythbuntu-ppa.outputs.versions }}
       meta: ${{ needs.fetch-backend-meta.outputs.metadata }}

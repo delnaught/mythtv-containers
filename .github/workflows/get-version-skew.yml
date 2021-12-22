@@ -16,18 +16,23 @@ on:
     outputs:
       matrix:
         description: 'json array of versions to be delivered'
-        value: ${{ jobs.slice.outputs.info }}
+        value: ${{ jobs.slice.outputs.slice }}
+      first:
+        description: 'first entry in matrix array'
+        value: ${{ jobs.slice.outputs.first }}
         
 
 jobs:
   slice:
     runs-on: ubuntu-latest
     outputs:
-      info: ${{ steps.slice-skew.outputs.slice }}
+      slice: ${{ steps.slice-skew.outputs.slice }}
+      first: ${{ steps.first-skew.outputs.first }}
     steps:
       - id: slice-skew
         run: |
           image_version=$(echo '${{ inputs.meta  }}' | jq -r '.config.Labels."mythtv.source_package_version"')
           ppa_index=$(echo '${{ inputs.ppa }}' | jq --arg ref $image_version -r '. | index($ref)')
           slice=$(echo '${{ inputs.ppa }}' | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
-          echo "::set-output name=slice::${slice}"
+          first=$(echo $slice | jq '.[0]')
+          echo "::set-output name=slice::${slice} name=first::${first}"
