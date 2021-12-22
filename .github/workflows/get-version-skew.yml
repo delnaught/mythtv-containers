@@ -38,3 +38,4 @@ jobs:
           fi
           length=$(echo $slice | jq -r '. | length')
           echo "::set-output name=slice::${slice} name=length=${length}"
+          echo "::debug length => ${length} slice => ${slice}"
