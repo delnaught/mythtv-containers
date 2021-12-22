@@ -29,4 +29,4 @@ jobs:
     uses: delnaught/mythtv-containers/.github/workflows/get-version-skew.yml@query-dockerhub
     with:
       ppa: ${{ needs.fetch-backend-ppa.outputs.versions }}
-      ref: ${{ needs.fetch-backend-meta.outputs.metadata }}
+      meta: ${{ needs.fetch-backend-meta.outputs.metadata }}

@@ -9,8 +9,8 @@ on:
         description: 'json array of versions available in the ppa'
         required: true
         type: string
-      ref:
-        description: 'reference image version'
+      meta:
+        description: 'reference image metadata'
         required: true
         type: string
     outputs:
@@ -27,8 +27,7 @@ jobs:
     steps:
       - id: slice-skew
         run: |
-          image_version=$(echo '${{ needs.fetch-backend-meta.outputs.metadata }}' | jq -r '.config.Labels."mythtv.source_package_version"')
-          echo $image_version
-          ppa_index=$(echo '${{ needs.fetch-backend-ppa.outputs.versions }}' | jq --arg ref $image_version -r '. | index("$ref")')
-          slice=$(echo '${{ needs.fetch-backend-ppa.outputs.versions }}' | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
+          image_version=$(echo '${{ inputs.meta  }}' | jq -r '.config.Labels."mythtv.source_package_version"')
+          ppa_index=$(echo '${{ inputs.ppa }}' | jq --arg ref $image_version -r '. | index("$ref")')
+          slice=$(echo '${{ inputs.ppa }}' | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
           echo "::set-output name=slice::${slice}"
