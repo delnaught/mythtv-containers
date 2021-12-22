@@ -9,6 +9,7 @@ on:
       - .github/workflows/deliver-on-skew.yml
       - .github/workflows/fetch-image-metadata.yml
       - .github/workflows/fetch-mythbuntu-ppa.yml
+      - .github/workflows/get-version-skew.yml
 
 jobs:
   fetch-backend-meta:
@@ -22,12 +23,10 @@ jobs:
       ppa: 32
       depth: 50
   get-image-skew:
-    runs-on: ubuntu-latest
     needs:
       - fetch-backend-meta
       - fetch-backend-ppa
-    steps:
-      - run: |
-          image_version=$(echo '${{ needs.fetch-backend-meta.outputs.metadata }}' | jq -r '.config.Labels."mythtv.source_package_version"')
-          ppa_index=$(echo '${{ needs.fetch-backend-ppa.outputs.versions }}' | jq --arg ref ${image_version} -r '. | index("$ref")')
-          slice=$(echo '${{ needs.fetch-backend-ppa.outputs.versions }}' | jq --arg eidx ${ppa_index} -r '.[0:($eidx | tonumber)]')
+    uses: delnaught/mythtv-containers/.github/workflows/get-version-skew.yml@query-dockerhub
+    with:
+      ppa: ${{ needs.fetch-backend-ppa.outputs.versions }}
+      ref: ${{ needs.fetch-backend-meta.outputs.metadata }}
