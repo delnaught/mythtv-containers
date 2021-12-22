@@ -32,10 +32,15 @@ jobs:
         run: |
           slice='${{ inputs.ppa }}'
           image_version=$(echo '${{ inputs.meta  }}' | jq -r '.config.Labels."mythtv.source_package_version"')
+          echo "::debug image => ${image_version}"
+          ppa_index='null'
+          if [[ '' != image_version ]]; then
           ppa_index=$(echo $slice | jq --arg ref $image_version -r '. | index($ref)')
+          fi
+          echo "::debug index => ${ppa_index}"
           if [[ 'null' != $ppa_index ]]; then
           slice=$(echo $slice | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
           fi
           length=$(echo $slice | jq -r '. | length')
           echo "::set-output name=slice::${slice} name=length=${length}"
-          echo "::debug image => ${image_version} index => ${ppa_index} length => ${length} slice => ${slice}"
+          echo "::debug length => ${length} slice => ${slice}"

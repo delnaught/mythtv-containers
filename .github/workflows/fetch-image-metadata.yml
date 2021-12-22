@@ -17,7 +17,7 @@ on:
       metadata:
         description: 'metadata from the remote image'
         value: ${{ jobs.query-dockerhub.outputs.info }}
-        
+
 
 jobs:
   query-dockerhub:
@@ -35,7 +35,14 @@ jobs:
           -H "Authorization: Bearer $token" \
           -s "https://registry-1.docker.io/v2/${repo}/manifests/${tag}" \
           | jq -r '.config.digest')
+          meta=''
+          http_code=$(curl -o /dev/null --silent -Iw '%{http_code}' \
+          -H "Authorization: Bearer $token" \
+          -s -L "https://registry-1.docker.io/v2/${repo}/blobs/${digest}")
+          if [[ "200" == $http_code ]]; then
           meta=$(curl -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
           -H "Authorization: Bearer $token" \
           -s -L "https://registry-1.docker.io/v2/${repo}/blobs/${digest}")
+          fi
           echo "::set-output name=metadata::${meta}"
+          echo "::debug ${http_code} => ${meta}"
