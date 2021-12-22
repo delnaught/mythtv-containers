@@ -62,5 +62,5 @@ jobs:
           except HTTPError as e:
             print(e.content)
           ')
-          echo "::set-output name=versions::${versions}"
+          echo "::set-output name=versions::${versions//\'/\"}"
           
