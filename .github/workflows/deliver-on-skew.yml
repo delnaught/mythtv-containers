@@ -29,5 +29,5 @@ jobs:
     steps:
       - run: |
           image_version=$(echo '${{ needs.fetch-backend-meta.outputs.metadata }}' | jq -r '.config.Labels."mythtv.source_package_version"')
-          ppa_index=$(echo '${{ needs.fetch-backend-ppa.outputs.versions }}' | jq --argjson ref ${image_version} -r '. | index("$ref")')
-          slice=$(echo '${{ needs.fetch-backend-ppa.outputs.versions }}' | jq --argjson eidx ${ppa_index} -r '.[0:($eidx | tonumber)]')
+          ppa_index=$(echo '${{ needs.fetch-backend-ppa.outputs.versions }}' | jq --arg ref ${image_version} -r '. | index("$ref")')
+          slice=$(echo '${{ needs.fetch-backend-ppa.outputs.versions }}' | jq --arg eidx ${ppa_index} -r '.[0:($eidx | tonumber)]')
