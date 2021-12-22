@@ -34,6 +34,25 @@ jobs:
     strategy:
       matrix:
         version: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
-    uses: delnaught/mythtv-containers/.github/workflows/build-and-publish-backend.yml@query-dockerhub
-    with:
-      source-ref: ${{ matrix.version }}
+    steps:
+      - id: get-date
+        run: |
+          date=${{ matrix.version }}
+          date=${date#*[~\+]*\.}
+          date=${date%%.*}
+          echo "::set-output name=date::${date}"
+      - uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: mythtv.dockerfile
+          build-args: |
+            FROM_IMAGE: ubuntu:focal
+            MYTHTV_VERSION=${{ matrix.version }}
+          labels: |
+            mythtv.source_package_version=${{ matrix.version }}
+          tags: |
+            delnaught/mythtv-backend:32-focal-${{ steps.get-date.outputs.date }}
