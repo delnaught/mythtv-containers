@@ -24,7 +24,8 @@ on:
       length:
         description: 'length of matrix array'
         value: ${{ jobs.parse.outputs.length }}
-        
+
+
 jobs:
   parse:
     runs-on: ubuntu-latest
@@ -33,6 +34,10 @@ jobs:
       length: ${{ steps.parse-skew.outputs.length }}
     steps:
       - id: parse-skew
+          # , "tags" : . | match("^[0-9]+:([0-9]+)\\.([0-9]+)[~\\+][a-z]+\\.([0-9]+)\\.").captures | (
+          # $repo + ":" + .[0].string + "." + .[1].string + "." + .[2].string + "," +
+          # $repo + ":" + .[0].string + "." + .[1].string + "," +
+          # $repo + ":" + .[0].string)
         run: |
           matrix='${{ inputs.ppa }}'
           image_version=$(echo '${{ inputs.meta  }}' | jq -r '.config.Labels."mythtv.source_package_version"')
@@ -47,13 +52,11 @@ jobs:
           fi
           length=$(echo $matrix | jq -r '. | length')
           echo "::debug length => ${length} original => ${matrix}"
-          matrix=$(echo $matrix | jq --arg repo ${{ inputs.image }}  -r '
-          . | reverse | map(
+          matrix=$(echo $matrix | jq --arg repo ${{ inputs.image }}  -r '.
+          | reverse
+          | map(
           { "source" : .
-          , "tags" : . | match("^[0-9]+:([0-9]+)\\.([0-9]+)[~\\+][a-z]+\\.([0-9]+)\\.").captures | (
-          $repo + ":" + .[0].string + "." + .[1].string + "." + .[2].string + "," +
-          $repo + ":" + .[0].string + "." + .[1].string + "," +
-          $repo + ":" + .[0].string)
+          , "tags" : .
           })'
           length=$(echo $matrix | jq -r '. | length')
           echo "::set-output name=matrix::${matrix}"
