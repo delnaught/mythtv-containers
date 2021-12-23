@@ -28,31 +28,30 @@ jobs:
     with:
       ppa: ${{ needs.fetch-mythbuntu-ppa.outputs.versions }}
       meta: ${{ needs.fetch-backend-meta.outputs.metadata }}
+      image: delnaught/mythtv-backend
   deliver-backend:
     runs-on: ubuntu-latest
     needs:
       - get-backend-skew
-    # if: ${{ 0 < needs.get-backend-skew.outputs.length }}
+    if: ${{ 0 < needs.get-backend-skew.outputs.length }}
     strategy:
-      matrix:
-        build: ${{ fromJson(needs.get-backend-skew.outputs.builds) }}
+      matrix: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
     steps:
-      - id: generate-tags
+      - id: stub
+        env:
+          SOURCE: ${{ matrix.source }}
+          TAGS: ${{ matrix.tags }}
         run: |
-          image="delnaught/mythtv-backend"
-          tags=$(echo ${{ matrix.build }} | jq --arg image $image -r '.
-          | { "source" : .
-          , "tags" : . | match("^[0-9]+:([0-9]+)\\.([0-9]+)[~\\+][a-z]+\\.([0-9]+)\\.").captures | (
-          $image + ":" + .[0].string + "." + .[1].string + "." + .[2].string + "," +
-          $image + ":" + .[0].string + "." + .[1].string + "," +
-          $image + ":" + .[0].string)
-          }')
-          echo "::debug ${{ matrix.build }} => $tags"
-          echo "::set-output name=tags::${tags}"
-      - id: build-push-stub
-        run: |
-          echo "::debug source: ${{ matrix.build}} tags: ${{ steps.generate-tags.outputs.tags }}"
-          echo "source: ${{ matrix.build}} tags: ${{ steps.generate-tags.outputs.tags }}"
+          echo "::debug source input ${{ matrix.source }}"
+          echo "::debug tags input ${{ matrix.tags }}"
+          echo "::debug source env $SOURCE"
+          echo "::debug tags env $TAGS"
+          echo "env $SOURCE => $TAGS}"
+          echo "input ${{ matrix.source }} => ${{ matrix.tags }}"
+
+
+
+      
       # - uses: docker/login-action@v1
       #   with:
       #     username: ${{ secrets.DOCKERHUB_USERNAME }}
