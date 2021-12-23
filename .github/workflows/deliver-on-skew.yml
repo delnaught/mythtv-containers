@@ -36,18 +36,11 @@ jobs:
     if: ${{ 0 < needs.get-backend-skew.outputs.length }}
     strategy:
       matrix:
-        include: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
+        build: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
     steps:
-      - env:
-          SOURCE: ${{ matrix.source }}
-          TAGS: ${{ matrix.tags }}
-        run: |
-          echo "::debug source input ${{ matrix.source }}"
-          echo "::debug tags input ${{ matrix.tags }}"
-          echo "::debug source env $SOURCE"
-          echo "::debug tags env $TAGS"
-          echo "env $SOURCE => $TAGS}"
-          echo "input ${{ matrix.source }} => ${{ matrix.tags }}"
+      - run: |
+          echo "::debug \"${{ matrix.build }}\""
+          echo "build: \"${{ matrix.build }}\""
       # - uses: docker/login-action@v1
       #   with:
       #     username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -58,8 +51,7 @@ jobs:
       #     file: mythtv.dockerfile
       #     build-args: |
       #       FROM_IMAGE: ubuntu:focal
-      #       MYTHTV_VERSION=${{ matrix.version }}
+      #       MYTHTV_VERSION=${{ matrix.source }}
       #     labels: |
-      #       mythtv.source_package_version=${{ matrix.version }}
-      #     tags: |
-      #       delnaught/mythtv-backend:${{ steps.generate-tag.outputs.tag }}
+      #       mythtv.source_package_version=${{ matrix.source }}
+      #     tags: ${{ matrix.tags }}
