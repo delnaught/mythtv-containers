@@ -18,11 +18,11 @@ on:
         required: true
         type: string
     outputs:
-      matrix:
+      builds:
         description: 'json array of versions to be delivered'
-        value: ${{ jobs.parse.outputs.matrix }}
+        value: ${{ jobs.parse.outputs.builds }}
       length:
-        description: 'length of matrix array'
+        description: 'length of builds array'
         value: ${{ jobs.parse.outputs.length }}
 
 
@@ -30,34 +30,24 @@ jobs:
   parse:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.parse-skew.outputs.matrix }}
+      builds: ${{ steps.parse-skew.outputs.builds }}
       length: ${{ steps.parse-skew.outputs.length }}
     steps:
       - id: parse-skew
         run: |
-          matrix='${{ inputs.ppa }}'
+          builds='${{ inputs.ppa }}'
           image_version=$(echo '${{ inputs.meta  }}' | jq -r '.config.Labels."mythtv.source_package_version"')
           echo "::debug image => ${image_version}"
           ppa_index='null'
           if [[ '' != image_version ]]; then
-          ppa_index=$(echo $matrix | jq --arg ref $image_version -r '. | index($ref)')
+          ppa_index=$(echo $builds | jq --arg ref $image_version -r '. | index($ref)')
           fi
           echo "::debug index => ${ppa_index}"
           if [[ 'null' != $ppa_index ]]; then
-          matrix=$(echo $matrix | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
+          builds=$(echo $builds | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
           fi
-          length=$(echo $matrix | jq -r '. | length')
-          echo "::debug length => ${length} original => ${matrix}"
-          matrix=$(echo $matrix | jq --arg repo ${{ inputs.image }}  -r '.
-          | reverse
-          | map(
-          { "source" : .
-          , "tags" : . | match("^[0-9]+:([0-9]+)\\.([0-9]+)[~\\+][a-z]+\\.([0-9]+)\\.").captures | (
-          $repo + ":" + .[0].string + "." + .[1].string + "." + .[2].string + "," +
-          $repo + ":" + .[0].string + "." + .[1].string + "," +
-          $repo + ":" + .[0].string)
-          })')
-          length=$(echo $matrix | jq -r '. | length')
-          echo "::set-output name=matrix::${matrix}"
+          builds=$(echo $builds | jq -r '. | reverse')
+          length=$(echo $builds | jq -r '. | length')
+          echo "::set-output name=builds::${builds}"
           echo "::set-output name=length::${length}"
-          echo "::debug length => ${length} transform => ${matrix}"
+          echo "::debug length => ${length} => ${builds}"
