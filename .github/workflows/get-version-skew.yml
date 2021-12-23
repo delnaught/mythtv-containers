@@ -13,10 +13,6 @@ on:
         description: 'reference image metadata'
         required: true
         type: string
-      image:
-        description: 'destination image to be built'
-        required: true
-        type: string
     outputs:
       builds:
         description: 'json array of versions to be delivered'
