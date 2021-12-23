@@ -13,10 +13,14 @@ on:
         description: 'reference image metadata'
         required: true
         type: string
+      image:
+        description: 'destination image to be built'
+        required: true
+        type: string
     outputs:
       matrix:
         description: 'json array of versions to be delivered'
-        value: ${{ jobs.parse.outputs.slice }}
+        value: ${{ jobs.parse.outputs.matrix }}
       length:
         description: 'length of matrix array'
         value: ${{ jobs.parse.outputs.length }}
@@ -25,23 +29,33 @@ jobs:
   parse:
     runs-on: ubuntu-latest
     outputs:
-      slice: ${{ steps.parse-skew.outputs.slice }}
+      matrix: ${{ steps.parse-skew.outputs.matrix }}
       length: ${{ steps.parse-skew.outputs.length }}
     steps:
       - id: parse-skew
         run: |
-          slice='${{ inputs.ppa }}'
+          matrix='${{ inputs.ppa }}'
           image_version=$(echo '${{ inputs.meta  }}' | jq -r '.config.Labels."mythtv.source_package_version"')
           echo "::debug image => ${image_version}"
           ppa_index='null'
           if [[ '' != image_version ]]; then
-          ppa_index=$(echo $slice | jq --arg ref $image_version -r '. | index($ref)')
+          ppa_index=$(echo $matrix | jq --arg ref $image_version -r '. | index($ref)')
           fi
           echo "::debug index => ${ppa_index}"
           if [[ 'null' != $ppa_index ]]; then
-          slice=$(echo $slice | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
+          matrix=$(echo $matrix | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
           fi
-          length=$(echo $slice | jq -r '. | length')
-          echo "::set-output name=slice::${slice}"
+          length=$(echo $matrix | jq -r '. | length')
+          echo "::debug length => ${length} original => ${matrix}"
+          matrix=$(echo $matrix | jq --arg repo ${{ inputs.image }}  -r '
+          . | reverse | map(
+          { "source" : .
+          , "tags" : . | match("^[0-9]+:([0-9]+)\\.([0-9]+)[~\\+][a-z]+\\.([0-9]+)\\.").captures | (
+          $repo + ":" + .[0].string + "." + .[1].string + "." + .[2].string + "," +
+          $repo + ":" + .[0].string + "." + .[1].string + "," +
+          $repo + ":" + .[0].string)
+          })'
+          length=$(echo $matrix | jq -r '. | length')
+          echo "::set-output name=matrix::${matrix}"
           echo "::set-output name=length::${length}"
-          echo "::debug length => ${length} slice => ${slice}"
+          echo "::debug length => ${length} transform => ${matrix}"

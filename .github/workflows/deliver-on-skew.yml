@@ -28,6 +28,7 @@ jobs:
     with:
       ppa: ${{ needs.fetch-mythbuntu-ppa.outputs.versions }}
       meta: ${{ needs.fetch-backend-meta.outputs.metadata }}
+      image: delnaught/mythtv-backend
   deliver-backend:
     runs-on: ubuntu-latest
     needs:
@@ -35,27 +36,23 @@ jobs:
     if: ${{ 0 < needs.get-backend-skew.outputs.length }}
     strategy:
       matrix:
-        version: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
+        include: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
     steps:
-      - id: get-date
-        run: |
-          date=${{ matrix.version }}
-          date=${date#*[~\+]*\.}
-          date=${date%%.*}
-          echo "::set-output name=date::${date}"
-          echo "::debug date => ${date}"
-      - uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: docker/build-push-action@v2
-        with:
-          push: true
-          file: mythtv.dockerfile
-          build-args: |
-            FROM_IMAGE: ubuntu:focal
-            MYTHTV_VERSION=${{ matrix.version }}
-          labels: |
-            mythtv.source_package_version=${{ matrix.version }}
-          tags: |
-            delnaught/mythtv-backend:32-focal-${{ steps.get-date.outputs.date }}
+      - run: |
+          echo "::debug ${{ matrix.source }}"
+          echo "::debug ${{ matrix.tags }}"
+      # - uses: docker/login-action@v1
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - uses: docker/build-push-action@v2
+      #   with:
+      #     push: true
+      #     file: mythtv.dockerfile
+      #     build-args: |
+      #       FROM_IMAGE: ubuntu:focal
+      #       MYTHTV_VERSION=${{ matrix.version }}
+      #     labels: |
+      #       mythtv.source_package_version=${{ matrix.version }}
+      #     tags: |
+      #       delnaught/mythtv-backend:${{ steps.generate-tag.outputs.tag }}
