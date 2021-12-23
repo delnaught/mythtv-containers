@@ -52,12 +52,7 @@ jobs:
           fi
           length=$(echo $matrix | jq -r '. | length')
           echo "::debug length => ${length} original => ${matrix}"
-          matrix=$(echo $matrix | jq --arg repo ${{ inputs.image }}  -r '.
-          | reverse
-          | map(
-          { "source" : .
-          , "tags" : .
-          })'
+          matrix=$(echo $matrix | jq --arg repo ${{ inputs.image }}  -r '. | reverse | map({ "source" : . , "tags" : . })'
           length=$(echo $matrix | jq -r '. | length')
           echo "::set-output name=matrix::${matrix}"
           echo "::set-output name=length::${length}"
