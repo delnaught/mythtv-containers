@@ -35,7 +35,8 @@ jobs:
       - get-backend-skew
     if: ${{ 0 < needs.get-backend-skew.outputs.length }}
     strategy:
-      matrix: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
+      matrix:
+        include: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
     steps:
       - id: stub
         env:
