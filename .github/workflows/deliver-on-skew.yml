@@ -38,32 +38,17 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.get-backend-skew.outputs.matrix) }}
     steps:
-      - id: stub
-        env:
-          SOURCE: ${{ matrix.source }}
-          TAGS: ${{ matrix.tags }}
-        run: |
-          echo "::debug source input ${{ matrix.source }}"
-          echo "::debug tags input ${{ matrix.tags }}"
-          echo "::debug source env $SOURCE"
-          echo "::debug tags env $TAGS"
-          echo "env $SOURCE => $TAGS}"
-          echo "input ${{ matrix.source }} => ${{ matrix.tags }}"
-
-
-
-      
-      # - uses: docker/login-action@v1
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-      # - uses: docker/build-push-action@v2
-      #   with:
-      #     push: true
-      #     file: mythtv.dockerfile
-      #     build-args: |
-      #       FROM_IMAGE: ubuntu:focal
-      #       MYTHTV_VERSION=${{ matrix.source }}
-      #     labels: |
-      #       mythtv.source_package_version=${{ matrix.source }}
-      #     tags: ${{ matrix.tags }}
+      - uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: mythtv.dockerfile
+          build-args: |
+            FROM_IMAGE: ubuntu:focal
+            MYTHTV_VERSION=${{ matrix.source }}
+          labels: |
+            mythtv.source_package_version=${{ matrix.source }}
+          tags: ${{ matrix.tags }}
