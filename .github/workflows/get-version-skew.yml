@@ -36,18 +36,18 @@ jobs:
       - id: parse-skew
         run: |
           matrix='${{ inputs.ppa }}'
-          image_version=$(echo '${{ inputs.meta  }}' | jq -r '.config.Labels."mythtv.source_package_version"')
+          image_version=$(echo '${{ inputs.meta  }}' | jq '.config.Labels."mythtv.source_package_version"')
           echo "::debug image => ${image_version}"
           ppa_index='null'
           if [[ '' != image_version ]]; then
-          ppa_index=$(echo $matrix | jq --arg ref $image_version -r '. | index($ref)')
+          ppa_index=$(echo $matrix | jq --arg ref $image_version '. | index($ref)')
           fi
           echo "::debug index => ${ppa_index}"
           if [[ 'null' != $ppa_index ]]; then
-          matrix=$(echo $matrix | jq --arg eidx $ppa_index -r '.[0:($eidx | tonumber)]')
+          matrix=$(echo $matrix | jq --arg eidx $ppa_index '.[0:($eidx | tonumber)]')
           fi
-          matrix=$(echo $matrix | jq -r '. | reverse')
-          matrix=$(echo $matrix | jq --arg repo ${{ inputs.image }}  -r '.
+          matrix=$(echo $matrix | jq '. | reverse')
+          matrix=$(echo $matrix | jq --arg repo ${{ inputs.image }}  '.
           | map(
           { "source" : .
           , "tags" : . | match("^[0-9]+:([0-9]+)\\.([0-9]+)[~\\+][a-z]+\\.([0-9]+)\\.").captures | (
@@ -55,8 +55,8 @@ jobs:
           $repo + ":" + .[0].string + "." + .[1].string + "," +
           $repo + ":" + .[0].string)
           })')
-          length=$(echo $matrix | jq -r '. | length')
-          matrix=$(echo $matrix | jq -r '. | { include: . }')
+          length=$(echo $matrix | jq '. | length')
+          matrix=$(echo $matrix | jq '. | { include: . }')
           echo "::set-output name=matrix::${matrix}"
           echo "::set-output name=length::${length}"
           echo "::debug length => ${length} transform => ${matrix}"
