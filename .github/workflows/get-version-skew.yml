@@ -56,7 +56,7 @@ jobs:
           $repo + ":" + .[0].string)
           })')
           length=$(echo $matrix | jq -r '. | length')
-          matrix=$(echo $matrix | jq -r '. | { "include" : . }'
+          matrix=$(echo $matrix | jq -r '. | { "include" : . }')
           echo "::set-output name=matrix::${matrix}"
           echo "::set-output name=length::${length}"
           echo "::debug length => ${length} transform => ${matrix}"
