@@ -1,0 +1,36 @@
+---
+
+name: 'Mythbuntu PPA Build Records'
+description: 'fetch Mythbuntu build records for a given ppa, architecture, and os release'
+
+inputs:
+  ppa-name:
+    description: 'mythbuntu PPA name'
+    required: true
+  record-count:
+    description: 'build records fetched prior to filtering'
+    required: false
+    default: 40
+  build-os:
+    description: 'OS version of interest'
+    required: false
+    default: '20.04'
+  build-arch:
+    description: 'arhitecture of interest'
+    required: false
+    default: 'amd64'
+
+outputs:
+  package-versions:
+    description: 'package version strings in a json array'
+  latest-version:
+    description: 'first (most recent) version in array'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.ppa-name }}
+    - ${{ inputs.record-count }}
+    - ${{ inputs.build-os }}
+    - ${{ inputs.build-arch }}
