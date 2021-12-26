@@ -11,8 +11,10 @@ jobs:
       matrix:
         ppa: ["32"]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - id: query-ppa
-        uses: actions/ppa-build-records-action
+        uses: ./actions/ppa-build-records-action
         with:
           ppa-name: {{ matrix.ppa }}
       - id: dump-versions
