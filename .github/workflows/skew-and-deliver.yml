@@ -38,3 +38,15 @@ jobs:
           else
           echo "::set-output name=tags::${tag_commit},${tag_full}"
           fi
+      - id: query-backend-image
+        uses: ./.github/actions/dockerhub-image-action
+        with:
+          image-name: delnaught/mythtv-backend
+          image-tag: ${{matrix-commit}}
+      - id: dump-dockerhub-code
+        run: |
+          echo "::debug ${{ steps.query-backend-image.outputs.http-code }}"
+      - id: conditional-build
+        if: ${{ "404" == steps.query-backend-image.outputs.http-code }}
+        run: |
+          echo "::debug reached!"

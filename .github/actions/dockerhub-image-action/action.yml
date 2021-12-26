@@ -1,0 +1,24 @@
+---
+
+name: 'Dockerhub Image Layer Query'
+description: 'HTTP code for the first layer in a dockerhub hosted image'
+
+inputs:
+  image-name:
+    description: 'image name, including namespace'
+    required: true
+  image-tag:
+    description: 'image tag to be queried'
+    required: true
+
+outputs:
+  html-code:
+    description: 'code to indicate if layer exists'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.image-name }}
+    - ${{ inputs.tag-name }}
+
