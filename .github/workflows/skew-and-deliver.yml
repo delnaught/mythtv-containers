@@ -23,9 +23,6 @@ jobs:
       - query-ppa
     strategy:
       matrix:
-        image:
-          - delnaught/mythtv-backend
-          - delnaught/mythtv-database
         include: ${{ fromJson(needs.query-ppa.outputs.build-records) }}
     steps:
       - id: checkout
