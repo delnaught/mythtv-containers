@@ -30,9 +30,10 @@ try:
     all_records = ppa.getBuildRecords(build_state = "Successfully built")[:records]
     arch_records = (record for record in all_records if record.arch_tag == arch)
     arch_builds = (tokenize_record(record) for record in arch_records)
-    versions = [build.version for build in arch_builds if build.os == release]
-    print(f"::set-output name=package-versions::{str(versions)}")
-    print(f"::set-output name=latest-version::{versions[0]}")
+    versions = (build.version for build in arch_builds if build.os == release)
+    json = [f"\"{version}\"" for version in versions]
+    print(f"::set-output name=package-versions::{str(json)}")
+    print(f"::set-output name=latest-version::{json[0]}")
 
 except HTTPError as e:
     print(f"::set-output name=package-versions::[]")

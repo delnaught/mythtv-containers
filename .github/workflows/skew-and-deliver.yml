@@ -17,6 +17,12 @@ jobs:
         uses: ./.github/actions/ppa-build-records-action
         with:
           ppa-name: "32"
+      - id: dump-versions
+        run: |
+          echo "::debug versions => ${{ steps.query.outputs.package-versions }}"
+          echo "::debug latest => ${{ steps.query.outputs.latest-version }}"
+
+          
   build-images:
     runs-on: ubuntu-latest
     strategy:
@@ -28,5 +34,3 @@ jobs:
           echo "::debug versions => ${{ jobs.query-ppa.outputs.package-versions }}"
           echo "::debug latest => ${{ jobs.query-ppa.outputs.latest-version }}"
           echo "::debug source => ${{ matrix.source-version }}"
-      
-    
