@@ -20,5 +20,5 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.image-name }}
-    - ${{ inputs.tag-name }}
+    - ${{ inputs.image-tag }}
 
