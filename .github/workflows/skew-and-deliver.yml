@@ -5,21 +5,28 @@ name: Skew and Deliver
 on: push
 
 jobs:
-  deliver-skew:
+  query-ppa:
+    runs-on: ubuntu-latest
+    outputs:
+      package-versions: ${{ steps.query.outputs.package-versions }}
+      latest-version: ${{ steps.query.outputs.latest-version }}
+    steps:
+      - id: checkout
+        uses: actions/checkout@v2
+      - id: query
+        uses: ./.github/actions/ppa-build-records-action
+        with:
+          ppa-name: "32"
+  build-images:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ppa: ["32"]
+        source-version: ${{ jobs.query-ppa.outputs.package-versions }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - id: query-ppa
-        uses: ./.github/actions/ppa-build-records-action
-        with:
-          ppa-name: ${{ matrix.ppa }}
       - id: dump-versions
         run: |
-          echo "::debug versions => ${{ steps.query-ppa.outputs.package-versions }}"
-          echo "::debug latest => ${{ steps.query-ppa.outputs.latest-version }}"
+          echo "::debug versions => ${{ jobs.query-ppa.outputs.package-versions }}"
+          echo "::debug latest => ${{ jobs.query-ppa.outputs.latest-version }}"
+          echo "::debug source => ${{ matrix.source-version }}"
       
     
