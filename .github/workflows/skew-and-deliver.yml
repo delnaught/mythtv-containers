@@ -47,6 +47,6 @@ jobs:
         run: |
           echo "::debug ${{ steps.query-backend-image.outputs.http-code }}"
       - id: conditional-build
-        if: ${{ "404" == steps.query-backend-image.outputs.http-code }}
+        if: ${{ steps.query-backend-image.outputs.http-code == '404' }}
         run: |
           echo "::debug reached!"
