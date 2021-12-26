@@ -1,6 +1,6 @@
 ---
 
-name: Skew and Deliver
+name: Deliver Image Gaps
 
 on: push
 
@@ -51,6 +51,28 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - id: test-conditional
-        run: |
-          echo "::debug tags: ${{ steps.build-tag-set.outputs.tags }}"
+      - id: build-push-backend
+        if: ${{ contains(matrix.image, 'backend') }}
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/mythtv-backend.dockerfile
+          build-args: |
+            FROM_IMAGE: ubuntu:focal
+            MYTHTV_VERSION=${{ matrix.source }}
+          labels: |
+            mythtv.source_package_version=${{ matrix.source }}
+          tags: ${{ steps.build-tag-set.outputs.tags }}
+      - id: build-push-database
+        if: ${{ contains(matrix.image, 'database') }}
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/mythtv-database.dockerfile
+          build-args: |
+            BUILDER_IMAGE=ubuntu:focal
+            RUNTIME_IMAGE=mariadb:10.3-focal
+            MYTHTV_VERSION=${{ matrix.source }}
+          labels: |
+            mythtv.source_package_version=${{ matrix.source }}
+          tags: ${{ steps.build-tag-set.outputs.tags }}
