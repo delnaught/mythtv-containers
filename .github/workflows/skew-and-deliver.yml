@@ -8,8 +8,7 @@ jobs:
   query-ppa:
     runs-on: ubuntu-latest
     outputs:
-      package-versions: ${{ steps.query.outputs.package-versions }}
-      latest-version: ${{ steps.query.outputs.latest-version }}
+      build-records: ${{ steps.query.outputs.build-records }}
     steps:
       - id: checkout
         uses: actions/checkout@v2
@@ -19,18 +18,19 @@ jobs:
           ppa-name: "32"
       - id: dump-versions
         run: |
-          echo "::debug versions => ${{ steps.query.outputs.package-versions }}"
-          echo "::debug latest => ${{ steps.query.outputs.latest-version }}"
+          echo "::debug versions => ${{ steps.query.outputs.build-records }}"
 
           
   build-images:
     runs-on: ubuntu-latest
+    needs:
+      - query-ppa
     strategy:
       matrix:
-        source-version: ${{ jobs.query-ppa.outputs.package-versions }}
+        include: ${{ fromJson(needs.query-ppa.outputs.build-records) }}
     steps:
       - id: dump-versions
         run: |
-          echo "::debug versions => ${{ jobs.query-ppa.outputs.package-versions }}"
-          echo "::debug latest => ${{ jobs.query-ppa.outputs.latest-version }}"
-          echo "::debug source => ${{ matrix.source-version }}"
+          echo "::debug index => ${{ matrix.index }}"
+          echo "::debug index => ${{ matrix.version }}"
+          echo "::debug index => ${{ matrix.date }}"
