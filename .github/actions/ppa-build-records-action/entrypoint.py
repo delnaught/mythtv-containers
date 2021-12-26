@@ -31,8 +31,8 @@ try:
     arch_records = (record for record in all_records if record.arch_tag == arch)
     arch_builds = (tokenize_record(record) for record in arch_records)
     versions = [build.version for build in arch_builds if build.os == release]
-    print(f"::set-output name=package-versions::{versions.str}")
-    print(f"::set-output name=latest-version::{versions[0].str}")
+    print(f"::set-output name=package-versions::{versions.str()}")
+    print(f"::set-output name=latest-version::{versions[0].str()}")
 
 except HTTPError as e:
     print(f"::set-output name=package-versions::[]")
