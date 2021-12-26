@@ -42,7 +42,7 @@ jobs:
         uses: ./.github/actions/dockerhub-image-action
         with:
           image-name: delnaught/mythtv-backend
-          image-tag: ${{matrix-commit}}
+          image-tag: ${{matrix.commit}}
       - id: dump-dockerhub-code
         run: |
           echo "::debug ${{ steps.query-backend-image.outputs.http-code }}"
