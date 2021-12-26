@@ -53,4 +53,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - id: test-conditional
         run: |
-          echo "::debug reached"
+          echo "::debug tags: ${{ steps.build-tag-set.outputs.tags }}"
