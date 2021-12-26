@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - id: query-ppa
-        uses: ./github/actions/ppa-build-records-action
+        uses: .github/actions/ppa-build-records-action
         with:
           ppa-name: ${{ matrix.ppa }}
       - id: dump-versions
