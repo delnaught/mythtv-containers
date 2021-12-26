@@ -4,7 +4,7 @@ name: 'Mythbuntu PPA Build Records'
 description: 'fetch Mythbuntu build records for a given ppa, architecture, and os release'
 
 inputs:
-  images-names:
+  image-names:
     description: 'JSON array of images to be built'
     required: true
   ppa-names:
