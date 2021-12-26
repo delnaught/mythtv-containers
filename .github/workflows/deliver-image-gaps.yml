@@ -16,7 +16,7 @@ jobs:
         uses: ./.github/actions/mythtv-matrix-action
         with:
           image-names: "[\"delnaught/mythtv-backend\", \"delnaught/mythtv-database\"]"
-          ppa-names: "[\"32\"]"
+          ppa-names: "[\"31\", \"32\"]"
           record-count: 30
           
   build-images:
