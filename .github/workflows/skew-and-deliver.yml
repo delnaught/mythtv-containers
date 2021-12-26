@@ -23,9 +23,21 @@ jobs:
       - query-ppa
     strategy:
       matrix:
+        image:
+          - delnaught/mythtv-backend
+          - delnaught/mythtv-database
         include: ${{ fromJson(needs.query-ppa.outputs.build-records) }}
     steps:
       - id: checkout
         uses: actions/checkout@v2
       - id: build-tag-set
-        run: echo "::set-output name::tags::${{matrix.major}}.${{matrix.minor}}.${{matrix.date}}"
+        run: |
+          tag_commit=${{matrix.commit}}
+          tag_full=${{matrix.major}}.${{matrix.minor}}.${{matrix.date}}-${{matrix.commit}}
+          tag_minor=${tag_full%.*}
+          tag_major=${tag_minor%.*}
+          if [[ "0" == ${{ matrix.index }} ]]; then
+          echo "::set-output name=tags::${tag_commit},${tag_full},${tag_minor},${tag_major},latest"
+          else
+          echo "::set-output name=tags::${tag_commit},${tag_full}"
+          fi
