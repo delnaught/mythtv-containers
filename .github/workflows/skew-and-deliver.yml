@@ -6,18 +6,18 @@ on: push
 
 jobs:
   deliver-skew:
-  runs-on: ubuntu-latest
-  strategy:
-    matrix:
-      ppa: ["32"]
-  steps:
-    - id: query-ppa
-      uses: actions/ppa-build-records-action
-      with:
-        ppa-name: {{ matrix.ppa }}
-    - id: dump-versions
-      run: |
-        echo "::debug versions => ${{ steps.query-ppa.outputs.package-versions }}"
-        echo "::debug latest => ${{ steps.query-ppa.outputs.latest-version }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ppa: ["32"]
+    steps:
+      - id: query-ppa
+        uses: actions/ppa-build-records-action
+        with:
+          ppa-name: {{ matrix.ppa }}
+      - id: dump-versions
+        run: |
+          echo "::debug versions => ${{ steps.query-ppa.outputs.package-versions }}"
+          echo "::debug latest => ${{ steps.query-ppa.outputs.latest-version }}"
       
     
