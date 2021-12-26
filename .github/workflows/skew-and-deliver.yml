@@ -15,7 +15,7 @@ jobs:
       - id: query
         uses: ./.github/actions/ppa-build-records-action
         with:
-          ppa-names: ["31", "32"]
+          ppa-names: "[\"31\", \"32\"]"
           record-count: 30
           
   build-images:
