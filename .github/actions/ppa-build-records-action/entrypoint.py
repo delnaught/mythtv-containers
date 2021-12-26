@@ -30,7 +30,7 @@ try:
     ppa = mythbuntu.getPPAByName(name=ppa_name)
     all_records = ppa.getBuildRecords(build_state = "Successfully built")[:records]
     arch_records = (record for record in all_records if record.arch_tag == arch)
-    arch_builds = (tokenize_record(record) for record in all_records)
+    arch_builds = (tokenize_record(record) for record in arch_records)
     os_builds = [build for build in arch_builds if release == build["os"]]
     index_builds = [os_builds[index].update({ "index": index}) or os_builds[index] for index in range(len(os_builds))]
     json = json.dumps(index_builds)
