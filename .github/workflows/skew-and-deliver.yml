@@ -13,7 +13,7 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2
       - id: query
-        uses: ./.github/actions/ppa-build-records-action
+        uses: ./.github/actions/mythtv-matrix-action
         with:
           image-names: "[\"delnaught/mythtv-backend\", \"delnaught/mythtv-database\"]"
           ppa-names: "[\"31\", \"32\"]"
@@ -41,7 +41,7 @@ jobs:
           echo "::set-output name=tags::${tag_commit},${tag_full}"
           fi
       - id: query-backend-image
-        uses: ./.github/actions/dockerhub-image-action
+        uses: ./.github/actions/dockerhub-present-action
         with:
           image-name: ${{ matrix.image }}
           image-tag: ${{matrix.commit}}
