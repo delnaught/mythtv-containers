@@ -4,6 +4,9 @@ name: 'Mythbuntu PPA Build Records'
 description: 'fetch Mythbuntu build records for a given ppa, architecture, and os release'
 
 inputs:
+  images-names:
+    description: 'JSON array of images to be built'
+    required: true
   ppa-names:
     description: 'JSON array of mythbuntu PPA names'
     required: true
@@ -28,6 +31,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - ${{ inputs.image-names }}
     - ${{ inputs.ppa-names }}
     - ${{ inputs.record-count }}
     - ${{ inputs.build-os }}

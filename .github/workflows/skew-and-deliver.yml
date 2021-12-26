@@ -15,6 +15,7 @@ jobs:
       - id: query
         uses: ./.github/actions/ppa-build-records-action
         with:
+          image-names: "[\"delnaught/mythtv-backend\", \"delnaught/mythtv-database\"]"
           ppa-names: "[\"31\", \"32\"]"
           record-count: 30
           
@@ -39,20 +40,16 @@ jobs:
           else
           echo "::set-output name=tags::${tag_commit},${tag_full}"
           fi
+      - id: query-backend-image
+        uses: ./.github/actions/dockerhub-image-action
+        with:
+          image-name: ${{ matrix.image }}
+          image-tag: ${{matrix.commit}}
       - id: docker-auth
+        if: ${{ steps.query-backend-image.outputs.http-code == '404' }}
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - id: query-backend-image
-        uses: ./.github/actions/dockerhub-image-action
-        with:
-          image-name: delnaught/mythtv-backend
-          image-tag: ${{matrix.commit}}
-      - id: dump-dockerhub-code
-        run: |
-          echo "::debug ${{ steps.query-backend-image.outputs.http-code }}"
-      - id: conditional-build
-        if: ${{ steps.query-backend-image.outputs.http-code == '404' }}
         run: |
           echo "::debug reached!"
