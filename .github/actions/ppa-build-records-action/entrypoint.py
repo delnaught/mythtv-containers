@@ -19,7 +19,7 @@ def tokenize_record(record):
     return build
 
 ppa_name = sys.argv[1]
-records = in(sys.argv[2])
+records = int(sys.argv[2])
 release = sys.argv[3]
 arch = sys.argv[4]
 
