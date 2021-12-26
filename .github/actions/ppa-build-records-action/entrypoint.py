@@ -6,14 +6,16 @@ import sys
 from launchpadlib.launchpad import Launchpad
 from lazr.restfulclient.errors import HTTPError
 
-record_re = re.compile(r"\.(?P<date>[0-9]+)\.(?P<commit>[0-9a-f]+)~ubuntu(?P<os>[0-9]+\.[0-9]+)\.[0-9]$")
+record_re = re.compile(r"^[^:]+:(?P<major>[0-9]+)\.(?P<minor>[0-9]+)[^\.]+\.(?P<date>[0-9]+)\.(?P<commit>[0-9a-f]+)~ubuntu(?P<os>[0-9]+\.[0-9]+)\.[0-9]$")
 
 def tokenize_record(record):
     build = {}
     match = record_re.search(record.source_package_version)
     if None != match:
-        build["version"] = record.source_package_version
+        build["source"] = record.source_package_version
         build["arch"] = record.arch_tag
+        build["major"] =  match.group("major")
+        build["minor"] =  match.group("minor")
         build["date"] = match.group("date")
         build["commit"] = match.group("commit")
         build["os"] = match.group("os")
