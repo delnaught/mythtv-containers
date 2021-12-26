@@ -3,7 +3,10 @@
 repo=$1
 tag=$2
 echo "::debug input ${repo}:${tag}"
-token=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq -r '.token')
+token_rest=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull")
+echo "::debug rtn => $? token_rest => ${token_rest}"
+token=$(echo $token_rest | jq -r '.token')
+#token=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq -r '.token')
 echo "::debug rtn => $? token => ${token}"
 digest=$(curl -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
               -H "Authorization: Bearer $token" \
