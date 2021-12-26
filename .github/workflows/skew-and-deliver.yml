@@ -16,10 +16,6 @@ jobs:
         uses: ./.github/actions/ppa-build-records-action
         with:
           ppa-name: "32"
-      - id: dump-versions
-        run: |
-          echo "::debug versions => ${{ steps.query.outputs.build-records }}"
-
           
   build-images:
     runs-on: ubuntu-latest
@@ -29,8 +25,7 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.query-ppa.outputs.build-records) }}
     steps:
-      - id: dump-versions
-        run: |
-          echo "::debug index => ${{ matrix.index }}"
-          echo "::debug index => ${{ matrix.version }}"
-          echo "::debug index => ${{ matrix.date }}"
+      - id: checkout
+        uses: actions/checkout@v2
+      - id: build-tag-set
+        run: echo "::set-output name::tags::${{matrix.major}}.${{matrix.minor}}.${{matrix.date}}"
