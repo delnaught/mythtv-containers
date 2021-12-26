@@ -51,5 +51,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - id: test-conditional
         run: |
-          echo "::debug reached!"
+          echo "::debug reached"
