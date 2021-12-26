@@ -16,7 +16,7 @@ jobs:
       - id: query-ppa
         uses: ./actions/ppa-build-records-action
         with:
-          ppa-name: {{ matrix.ppa }}
+          ppa-name: ${{ matrix.ppa }}
       - id: dump-versions
         run: |
           echo "::debug versions => ${{ steps.query-ppa.outputs.package-versions }}"
