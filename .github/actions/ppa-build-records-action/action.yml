@@ -4,11 +4,11 @@ name: 'Mythbuntu PPA Build Records'
 description: 'fetch Mythbuntu build records for a given ppa, architecture, and os release'
 
 inputs:
-  ppa-name:
-    description: 'mythbuntu PPA name'
+  ppa-names:
+    description: 'JSON array of mythbuntu PPA names'
     required: true
   record-count:
-    description: 'build records fetched prior to filtering'
+    description: 'build records per PPA fetched prior to filtering'
     required: false
     default: 40
   build-os:
@@ -21,16 +21,14 @@ inputs:
     default: 'amd64'
 
 outputs:
-  package-versions:
-    description: 'package version strings in a json array'
-  latest-version:
-    description: 'first (most recent) version in array'
+  build-matrix:
+    description: 'package information in a json array'
 
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.ppa-name }}
+    - ${{ inputs.ppa-names }}
     - ${{ inputs.record-count }}
     - ${{ inputs.build-os }}
     - ${{ inputs.build-arch }}

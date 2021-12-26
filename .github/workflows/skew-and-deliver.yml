@@ -8,14 +8,15 @@ jobs:
   query-ppa:
     runs-on: ubuntu-latest
     outputs:
-      build-records: ${{ steps.query.outputs.build-records }}
+      build-matrix: ${{ steps.query.outputs.build-matrix }}
     steps:
       - id: checkout
         uses: actions/checkout@v2
       - id: query
         uses: ./.github/actions/ppa-build-records-action
         with:
-          ppa-name: "32"
+          ppa-names: ["31", "32"]
+          record-count: 30
           
   build-images:
     runs-on: ubuntu-latest
@@ -23,7 +24,7 @@ jobs:
       - query-ppa
     strategy:
       matrix:
-        include: ${{ fromJson(needs.query-ppa.outputs.build-records) }}
+        include: ${{ fromJson(needs.query-ppa.outputs.build-matrix) }}
     steps:
       - id: checkout
         uses: actions/checkout@v2

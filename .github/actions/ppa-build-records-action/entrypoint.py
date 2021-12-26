@@ -21,7 +21,7 @@ def tokenize_record(record):
         build["os"] = match.group("os")
     return build
 
-ppa_name = sys.argv[1]
+ppa_names = json.loads(sys.argv[1])
 records = int(sys.argv[2])
 release = sys.argv[3]
 arch = sys.argv[4]
@@ -29,17 +29,18 @@ arch = sys.argv[4]
 try:
     launchpad = Launchpad.login_anonymously("mythbuntu-ppa-query", "production", version="devel")
     mythbuntu = launchpad.people["mythbuntu"]
-    ppa = mythbuntu.getPPAByName(name=ppa_name)
-    all_records = ppa.getBuildRecords(build_state = "Successfully built")[:records]
-    arch_records = (record for record in all_records if record.arch_tag == arch)
-    arch_builds = (tokenize_record(record) for record in arch_records)
-    os_builds = [build for build in arch_builds if release == build["os"]]
-    index_builds = [os_builds[index].update({ "index": index}) or os_builds[index] for index in range(len(os_builds))]
-    json = json.dumps(index_builds)
-    print(f"::set-output name=build-records::{json}")
+    all_builds = []
+    for ppa_name in ppa_names:
+        ppa = mythbuntu.getPPAByName(name=ppa_name)
+        all_records = ppa.getBuildRecords(build_state = "Successfully built")[:records]
+        arch_records = (record for record in all_records if record.arch_tag == arch)
+        arch_builds = (tokenize_record(record) for record in arch_records)
+        os_builds = [build for build in arch_builds if release == build["os"]]
+        all_builds += [os_builds[index].update({ "index": index}) or os_builds[index] for index in range(len(os_builds))]
+    json = json.dumps(all_builds)
+    print(f"::set-output name=build-matrix::{json}")
 
 except HTTPError as e:
-    print(f"::set-output name=package-versions::[]")
-    print(f"::set-output name=latest-version::\"\"")
-    print(f"::error file=action.yml,line=37::{e.content}")
+    print("::set-output name=build-matrix::{}")
+    print(f"::error file=action.yml,line=43::{e.content}")
     sys.exit(1)
