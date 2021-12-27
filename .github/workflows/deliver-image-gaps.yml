@@ -2,7 +2,14 @@
 
 name: Deliver Image Gaps
 
-on: push
+on:
+  schedule:
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - 'mythtv/**'
+      - '**/*.md'
 
 jobs:
   query-ppa:
