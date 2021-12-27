@@ -1,0 +1,87 @@
+---
+
+name: Deliver Image Gaps
+
+on:
+  schedule:
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - 'mythtv/**'
+      - '**/*.md'
+
+jobs:
+  query-ppa:
+    runs-on: ubuntu-latest
+    outputs:
+      build-matrix: ${{ steps.query.outputs.build-matrix }}
+    steps:
+      - id: checkout
+        uses: actions/checkout@v2
+      - id: query
+        uses: ./.github/actions/mythtv-matrix-action
+        with:
+          image-names: "[\"delnaught/mythtv-backend\", \"delnaught/mythtv-database\"]"
+          ppa-names: "[\"31\", \"32\"]"
+          record-count: 30
+          
+  build-images:
+    runs-on: ubuntu-latest
+    needs:
+      - query-ppa
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.query-ppa.outputs.build-matrix) }}
+    steps:
+      - id: checkout
+        uses: actions/checkout@v2
+      - id: dockerhub-auth
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - id: build-tag-set
+        run: |
+          tag_latest="${{matrix.image}}:latest"
+          tag_commit="${{matrix.image}}:${{matrix.commit}}"
+          tag_full="${{matrix.image}}:${{matrix.major}}.${{matrix.minor}}.${{matrix.date}}"
+          tag_minor="${tag_full%.*}"
+          tag_major="${tag_minor%.*}"
+          if [[ "0" == ${{ matrix.index }} ]]; then
+          echo "::set-output name=tags::${tag_commit},${tag_full},${tag_minor},${tag_major},${tag_latest}"
+          else
+          echo "::set-output name=tags::${tag_commit},${tag_full}"
+          fi
+      - id: query-image-presence
+        uses: ./.github/actions/dockerhub-present-action
+        with:
+          image-name: ${{ matrix.image }}
+          image-tag: ${{matrix.commit}}
+      - id: build-push-backend
+        if: ${{ contains(matrix.image, 'backend') && (steps.query-image-presence.outputs.http-code == '404') }}
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/mythtv-backend.dockerfile
+          build-args: |
+            PPA_NAME=${{ matrix.ppa }}
+            FROM_IMAGE=ubuntu:focal
+            MYTHTV_VERSION=${{ matrix.source }}
+          labels: |
+            mythtv.source_package_version=${{ matrix.source }}
+          tags: ${{ steps.build-tag-set.outputs.tags }}
+      - id: build-push-database
+        if: ${{ contains(matrix.image, 'database') && (steps.query-image-presence.outputs.http-code == '404') }}
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          file: docker/mythtv-database.dockerfile
+          build-args: |
+            PPA_NAME=${{ matrix.ppa }}
+            BUILDER_IMAGE=ubuntu:focal
+            RUNTIME_IMAGE=mariadb:10.3-focal
+            MYTHTV_VERSION=${{ matrix.source }}
+          labels: |
+            mythtv.source_package_version=${{ matrix.source }}
+          tags: ${{ steps.build-tag-set.outputs.tags }}
