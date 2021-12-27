@@ -54,7 +54,7 @@ jobs:
           image-name: ${{ matrix.image }}
           image-tag: ${{matrix.commit}}
       - id: build-push-backend
-        if: ${{ contains(matrix.image, 'backend') && steps.query-image-presence.outputs.http-code == '404' }}
+        if: ${{ contains(matrix.image, 'backend') && (steps.query-image-presence.outputs.http-code == '404') }}
         continue-on-error: true
         uses: docker/build-push-action@v2
         with:
@@ -67,7 +67,7 @@ jobs:
             mythtv.source_package_version=${{ matrix.source }}
           tags: ${{ steps.build-tag-set.outputs.tags }}
       - id: build-push-database
-        if: ${{ contains(matrix.image, 'database') && steps.query-image-presence.outputs.http-code == '404' }}
+        if: ${{ contains(matrix.image, 'database') && (steps.query-image-presence.outputs.http-code == '404') }}
         continue-on-error: true
         uses: docker/build-push-action@v2
         with:
