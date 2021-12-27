@@ -22,7 +22,7 @@ RUN chmod 755 /usr/local/bin/* \
     && echo 'deb http://ppa.launchpad.net/mythbuntu/32/ubuntu focal main' >> /etc/apt/sources.list \
     && echo 'deb-src http://ppa.launchpad.net/mythbuntu/32/ubuntu focal main' >> /etc/apt/sources.list \
     && apt-get update \
-    && DEBIAN_FRONTEND="noninteractive" apt-get -y --no-install-recommends install mythtv-backend=$MYTHTV_VERSION \
+    && DEBIAN_FRONTEND="noninteractive" apt-get -y --no-install-recommends install mythtv-backend="$MYTHTV_VERSION" \
     && apt-get -y dist-upgrade \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

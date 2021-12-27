@@ -14,7 +14,7 @@ RUN apt-get update \
     && apt-get update \
     && /etc/init.d/mysql start \
     && while [ ! -e /var/run/mysqld/mysqld.sock ]; do sleep 1; done; sleep 1 \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mythtv-database=$MYTHTV_VERSION \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mythtv-database="$MYTHTV_VERSION" \
     && mysqldump --all-databases -uroot > /tmp/all-databases.sql \
     && /etc/init.d/mysql stop
 
