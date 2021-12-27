@@ -33,10 +33,10 @@ jobs:
         uses: actions/checkout@v2
       - id: build-tag-set
         run: |
-          tag_commit=${{matrix.commit}}
-          tag_full=${{matrix.major}}.${{matrix.minor}}.${{matrix.date}}-${{matrix.commit}}
-          tag_minor=${tag_full%.*}
-          tag_major=${tag_minor%.*}
+          tag_commit="${{matrix.image}}:${{matrix.commit}}"
+          tag_full="${{matrix.image}}:${{matrix.major}}.${{matrix.minor}}.${{matrix.date}}"
+          tag_minor="${tag_full%.*}"
+          tag_major="${tag_minor%.*}"
           if [[ "0" == ${{ matrix.index }} ]]; then
           echo "::set-output name=tags::${tag_commit},${tag_full},${tag_minor},${tag_major},latest"
           else
