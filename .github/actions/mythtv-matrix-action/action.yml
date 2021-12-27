@@ -13,7 +13,7 @@ inputs:
   record-count:
     description: 'build records per PPA fetched prior to filtering'
     required: false
-    default: 40
+    default: 20
   build-os:
     description: 'OS version of interest'
     required: false

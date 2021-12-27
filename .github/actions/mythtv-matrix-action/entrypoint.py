@@ -39,7 +39,7 @@ try:
             all_records = ppa.getBuildRecords(build_state = "Successfully built")[:records]
             arch_records = (record for record in all_records if record.arch_tag == arch)
             arch_builds = (tokenize_record(record, image_name, ppa_name) for record in arch_records)
-            os_builds = [build for build in arch_builds if release == build["os"]][:1]
+            os_builds = [build for build in arch_builds if release == build["os"]]
             all_builds += [os_builds[index].update({ "index": index}) or os_builds[index] for index in range(len(os_builds))]
     json = json.dumps(all_builds)
     print(f"::set-output name=build-matrix::{json}")
