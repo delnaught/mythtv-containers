@@ -53,12 +53,12 @@ jobs:
           image-tag: ${{matrix.commit}}
       - id: build-push-backend
         if: ${{ contains(matrix.image, 'backend') && (steps.query-image-presence.outputs.http-code == '404') }}
-        continue-on-error: true
         uses: docker/build-push-action@v2
         with:
           push: true
           file: docker/mythtv-backend.dockerfile
           build-args: |
+            PPA_NAME=${{ matrix.ppa }}
             FROM_IMAGE=ubuntu:focal
             MYTHTV_VERSION=${{ matrix.source }}
           labels: |
@@ -66,12 +66,12 @@ jobs:
           tags: ${{ steps.build-tag-set.outputs.tags }}
       - id: build-push-database
         if: ${{ contains(matrix.image, 'database') && (steps.query-image-presence.outputs.http-code == '404') }}
-        continue-on-error: true
         uses: docker/build-push-action@v2
         with:
           push: true
           file: docker/mythtv-database.dockerfile
           build-args: |
+            PPA_NAME=${{ matrix.ppa }}
             BUILDER_IMAGE=ubuntu:focal
             RUNTIME_IMAGE=mariadb:10.3-focal
             MYTHTV_VERSION=${{ matrix.source }}
