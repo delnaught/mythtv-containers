@@ -1,0 +1,62 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+  namespace: mythtv
+  labels:
+    app: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      securityContext:
+        fsGroup: 999
+      containers:
+        - name: database
+          image: delnaught/mythtv-database:32
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: root_password
+          ports:
+            - name: mysql
+              containerPort: 3306
+              protocol: TCP
+          volumeMounts:
+            - name: data-mysql
+              mountPath: '/var/lib/mysql'
+      volumes:
+        - name: data-mysql
+          hostPath:
+            path: /media/data/mysql
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: mythtv
+  labels:
+    name: database
+    kubernetes.io/name: 'MythDatabase'
+spec:
+  selector:
+    app: database
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+      protocol: TCP
+  type: ClusterIP
+
