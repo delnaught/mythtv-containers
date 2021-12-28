@@ -53,7 +53,7 @@ jobs:
           else
           echo "::set-output name=tags::${tag_full}"
           fi
-          echo "::set-output name=tag::${tag_only}
+          echo "::set-output name=tag::${tag_only}"
       - id: query-image-presence
         uses: ./.github/actions/dockerhub-present-action
         with:
