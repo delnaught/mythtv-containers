@@ -1,0 +1,63 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: mythtv
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+    spec:
+      securityContext:
+        fsGroup: 107
+        runAsUser: 105
+        runAsGroup: 107
+      containers:
+        - name: backend
+          image: delnaught/mythtv-backend:32
+          # command: ['/usr/local/bin/mythtv-setup-vnc']
+          env:
+            - name: ZAP2XML_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: zap2it
+                  key: password
+            - name: ZAP2XML_USER
+              valueFrom:
+                secretKeyRef:
+                  name: zap2it
+                  key: user
+            - name: XMLTV_FILE
+              value: '/var/lib/mythtv/zap2it/xmltv.xml'
+            - name: EPG_DAYS
+              value: '10'
+            - name: ICON_DIR
+              value: '/var/lib/mythtv/.mythtv/channels'
+            - name: SOURCE_ID
+              value: '1'
+            - name: VNCPASSWORD
+              value: 'mythtv'
+          volumeMounts:
+            - name: config-mythtv
+              mountPath: '/etc/mythtv/config.xml'
+            - name: content-mythtv
+              mountPath: '/var/lib/mythtv'
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      hostname: 'mrx'
+      volumes:
+        - name: config-mythtv
+          hostPath:
+            path: /media/data/mythtv/config.xml
+        - name: content-mythtv
+          hostPath:
+            path: /media/data/mythtv/content
