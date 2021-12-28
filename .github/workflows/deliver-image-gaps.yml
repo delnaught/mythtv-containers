@@ -44,20 +44,21 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - id: build-tag-set
         run: |
-          tag_commit="${{matrix.image}}:${{matrix.commit}}"
-          tag_full="${{matrix.image}}:${{matrix.major}}.${{matrix.minor}}.${{matrix.date}}"
+          tag_only="${{matrix.major}}.${{matrix.minor}}.${{matrix.date}}-${{matrix.commit}}"
+          tag_full="${{matrix.image}}:${tag_only}"
           tag_minor="${tag_full%.*}"
           tag_major="${tag_minor%.*}"
           if [[ "0" == ${{ matrix.index }} ]]; then
-          echo "::set-output name=tags::${tag_commit},${tag_full},${tag_minor},${tag_major}"
+          echo "::set-output name=tags::${tag_full},${tag_minor},${tag_major}"
           else
-          echo "::set-output name=tags::${tag_commit},${tag_full}"
+          echo "::set-output name=tags::${tag_full}"
           fi
+          echo "::set-output name=tag::${tag_only}
       - id: query-image-presence
         uses: ./.github/actions/dockerhub-present-action
         with:
           image-name: ${{ matrix.image }}
-          image-tag: ${{matrix.commit}}
+          image-tag: ${{ steps.build-tag-set.outputs.tag }}
       - id: build-push-backend
         if: ${{ contains(matrix.image, 'backend') && (steps.query-image-presence.outputs.http-code == '404') }}
         uses: docker/build-push-action@v2
