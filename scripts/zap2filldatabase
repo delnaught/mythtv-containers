@@ -8,7 +8,7 @@ CACHE_DIR="${XMLTV_DIR}/cache"
 
 for dir in $CACHE_DIR $ICON_DIR; do if [[ ! -d ${dir} ]]; then mkdir -p ${dir}; fi; done
 
-zap2xml.pl -u $ZAP2XML_USER -p $ZAP2XML_PASSWD -U -o $XMLTV_FILE -c $CACHE_DIR -A "new live" -T -d $EPG_DAYS -F -a -i $ICON_DIR
+zap2xml.pl -u $ZAP2XML_USER -p $ZAP2XML_PASSWD -U -o $XMLTV_FILE -c $CACHE_DIR -T -d $EPG_DAYS -F -a -i $ICON_DIR
 mythfilldatabase --file --sourceid $SOURCE_ID --xmlfile $XMLTV_FILE
 
 
