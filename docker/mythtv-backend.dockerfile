@@ -17,6 +17,7 @@ RUN chmod 755 /usr/local/bin/* \
     && apt-get -y install --no-install-recommends gnupg locales tzdata sudo rsync \
     && apt-get -y install --no-install-recommends tigervnc-standalone-server tigervnc-common \
     && apt-get -y install --no-install-recommends libjson-xs-perl xmltv xmltv-util \
+    && apt-get -y install --no-install-recommends libdbi-perl libdbd-mysql-perl \
     && locale-gen en_US.UTF-8 \
     && dpkg-reconfigure --frontend noninteractive locales \
     && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 13551B881504888C \

@@ -24,8 +24,8 @@ services:
     user: 105:107
     network_mode: "host"
     volumes:
-      - /media/data/mythtv/content:/var/lib/mythtv
-      - /media/data/mythtv/config.xml:/etc/mythtv/config.xml:ro
+      - /media/data/mythtv:/var/lib/mythtv
+      - /media/data/.mythtv:/home/mythtv/.mythtv
     environment:
       XMLTV_FILE: /var/lib/mythtv/zap2it/xmltv.xml
       EPG_DAYS: 10
