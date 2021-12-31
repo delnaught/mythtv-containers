@@ -48,10 +48,10 @@ jobs:
           tag_full="${{matrix.image}}:${tag_only}"
           tag_minor="${tag_full%.*}"
           tag_major="${tag_minor%.*}"
-          if [[ "0" == ${{ matrix.index }} ]]; then
-          echo "::set-output name=tags::${tag_full},${tag_minor},${tag_major}"
-          else
+          if [[ "push" == ${{ github.event_name }} ]]; then
           echo "::set-output name=tags::${tag_full}"
+          else
+          echo "::set-output name=tags::${tag_full},${tag_minor},${tag_major}"
           fi
           echo "::set-output name=tag::${tag_only}"
       - id: query-image-presence
@@ -60,7 +60,7 @@ jobs:
           image-name: ${{ matrix.image }}
           image-tag: ${{ steps.build-tag-set.outputs.tag }}
       - id: build-push-backend
-        if: ${{ contains(matrix.image, 'backend') && (steps.query-image-presence.outputs.http-code == '404') }}
+        if: ${{ contains(matrix.image, 'backend') && ((github.event_name == 'push') || (steps.query-image-presence.outputs.http-code == '404')) }}
         uses: docker/build-push-action@v2
         with:
           push: true
@@ -73,7 +73,7 @@ jobs:
             mythtv.source_package_version=${{ matrix.source }}
           tags: ${{ steps.build-tag-set.outputs.tags }}
       - id: build-push-database
-        if: ${{ contains(matrix.image, 'database') && (steps.query-image-presence.outputs.http-code == '404') }}
+        if: ${{ contains(matrix.image, 'database') && ((github.event_name == 'push') || (steps.query-image-presence.outputs.http-code == '404')) }}
         uses: docker/build-push-action@v2
         with:
           push: true
