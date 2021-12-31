@@ -47,17 +47,17 @@ spec:
             - name: VNCPASSWORD
               value: 'mythtv'
           volumeMounts:
-            - name: config-mythtv
-              mountPath: '/etc/mythtv/config.xml'
-            - name: content-mythtv
+            - name: mythtv-user
+              mountPath: '/home/mythtv/.mythtv'
+            - name: mythtv-varlib
               mountPath: '/var/lib/mythtv'
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
       hostname: 'mrx'
       volumes:
-        - name: config-mythtv
+        - name: mythtv-user
           hostPath:
-            path: /media/data/mythtv/config.xml
-        - name: content-mythtv
+            path: /media/data/.mythtv
+        - name: mythtv-varlib
           hostPath:
-            path: /media/data/mythtv/content
+            path: /media/data/mythtv
