@@ -24,6 +24,7 @@ spec:
       containers:
         - name: backend
           image: delnaught/mythtv-backend:32
+          imagePullPolicy: Always
           # command: ['/usr/local/bin/mythtv-setup-vnc']
           env:
             - name: ZAP2XML_PASSWD
